@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QuickSplit</title>
+  
+  <!-- Your CSS file reference -->
+  <link rel="stylesheet" type="text/css" href="/static/css/video_editor.css">
+  
+  <!-- Example: Google Analytics and ffmpeg.js references -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-42MQ6EYRNN"></script>
+  <script src="/static/js/ffmpeg.js"></script>
+</head>
+<body>
+
+  <!-- GitHub Link Badge (optional) -->
+  <a href="https://github.com/pavloshargan/fast-web-trimming-tool" target="_blank" class="github-link" aria-label="Star the repository on GitHub">
+    <link 
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-p1PfY7xCg+PGhjk8XcgNtXav4z2sR+Zz3bVsuXphN8uYjbdOfhHyaqG8pJnWX6KyvZr3ZBJoMjRmzHrG0yI8jw==" 
+      crossorigin="anonymous" 
+      referrerpolicy="no-referrer" 
+    />
+    <!-- GitHub SVG Icon -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 
+        0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.744.084-.729.084-.729 
+        1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.42-1.305.763-1.605-2.665-.3-5.466-1.332-5.466-5.93 
+        0-1.31.468-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 013.003-.403c1.02.005 2.045.138 3.003.403 
+        2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 
+        0 4.61-2.805 5.625-5.475 5.92.435.375.81 1.102.81 2.222 
+        0 1.606-.015 2.898-.015 3.293 0 .315.21.694.825.576 
+        C20.565 21.795 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
+    </svg>
+    <span class="github-text">Star Us</span>
+  </a>
+
+  <h2>QuickSplit</h2>
+  
+  <label id="custom-file-button" for="file-input">Select Files</label>
+  <input
+    id="file-input"
+    type="file"
+    accept="video/*"
+    multiple
+    style="display: none;"
+  />
+  
+
+  <div class="layout-container">
+    
+    <!-- Left side: Thumbnails -->
+    <div class="video-list-column">
+      <div id="video-list">
+        <!-- JS will create .video-item elements here -->
+      </div>
+    </div>
+
+    <!-- Right side: Video + slider -->
+    <div class="video-column">
+      
+      <div id="video-container">
+        <video id="video" playsinline></video>
+      </div>
+
+      <div id="player-controls">
+        <button id="play-pause-btn">►</button>
+        <input
+          type="range"
+          id="player-timeline"
+          min="0"
+          max="100"
+          step="0.01"
+          value="0"
+        />
+        <span id="time-display">0:00 / 0:00</span>
+      </div>
+    </div>
+  </div>
+
+<!-- Split, Delete, Undo, Export Buttons -->
+<div id="buttons-row">
+  <div class="spacer"></div>
+
+  <div id="split-button">
+    <img src="/static/scissors.png" alt="Scissors icon" />
+    <span>Split</span>
+  </div>
+
+  <div id="delete-button" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M9 3V4H4V6H5V20C5 21.1046 5.89543 22 7 22H17C18.1046 
+          22 19 21.1046 19 20V6H20V4H15V3C15 1.89543 14.1046 
+          1 13 1H11C9.89543 1 9 1.89543 9 3ZM11 3H13V4H11V3ZM7 
+          6H17V20H7V6Z">
+      </path>
+    </svg>
+    <span>Delete</span>
+  </div>
+
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+  <div class="spacer"></div>
+
+  <div id="undo-button" style="display: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+         viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 5V2l-8 7 8 7v-3h4c2.21 0 4 1.79 4 4s-1.79 4-4 4h-5v2h5
+               c3.31 0 6-2.69 6-6s-2.69-6-6-6h-4z"/>
+    </svg>
+    <span>Undo</span>
+  </div>
+
+  <div id="export-button">
+    <img src="/static/export.svg" alt="Export icon" />
+    <span>Export</span>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+  <!-- Timeline area (showing segments) -->
+  <div id="timeline">
+    <div id="spike-triangle"></div>
+    <div id="timeline-spike"></div>
+    <div id="split-indicator"></div>
+    <div id="hover-indicator"></div>
+  </div>
+
+  <!-- ===== MODALS ===== -->
+  <!-- Export Modal -->
+  <div id="exportModal" class="modal">
+    <div class="modal-content">
+      <p>Select Export Option:</p>
+      <div class="button-container">
+        <button id="export-separate" class="export-button">Separate Files</button>
+        <button id="export-merged" class="export-button">Single Video</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generic Modal -->
+  <div id="myModal" style="z-index: 2147483647;" class="modal">
+    <div style="z-index: 2147483647;" class="modal-content">
+      <span class="close">&times;</span>
+      <p id="modalMessage"></p>
+      <button id="okButton" class="ok-button">OK</button>
+    </div>
+  </div>
+
+  <!-- Your custom JS -->
+  <script src="/static/js/gpmf_parse.js"></script>
+  <script src="/static/js/video_editor_utils.js"></script>
+  <script src="/static/js/video_editor.js"></script>
+
+</body>
+</html>

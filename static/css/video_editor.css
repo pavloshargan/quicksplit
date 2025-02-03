@@ -1,0 +1,486 @@
+#segment {
+  width: 0%;
+  height: 100%;
+  background: #fb4b0e;
+  border-radius: 5px;
+  position: relative;
+}
+
+#custom-file-button {
+background-color: #fb4b0e;
+color: white;
+border: none;
+border-radius: 5px;
+padding: 10px 20px;
+font-size: 16px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+
+/* Add spacing so the video doesn't overlap */
+display: inline-block; /* Ensure the label can take margin/padding properly */
+margin: 0px 0px 20px 0px;      
+}
+
+#custom-file-button:hover {
+background-color: #f66434;
+}
+
+
+
+#video-list {
+  list-style: none;
+  padding: 0;
+  max-width: 960px;
+  max-height:640px;
+  margin: 20px auto;
+  text-align: left;
+}
+
+#video-list li {
+  padding: 10px;
+  background: #ddd;
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#video-list li:hover {
+  background: #bbb;
+}
+
+.video-segment {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background-color: #00000000;
+  border-radius: 10px;
+  /* Add overflow hidden so child slices are clipped to this curve: */
+  overflow: hidden;
+
+  pointer-events: auto;
+  border: 1px solid white;
+  box-sizing: border-box;
+  cursor: grab;
+}
+
+
+.video-segment.selected {
+  border: 2px solid #fff;
+  opacity: 0.3;
+}
+
+.video-segment.drop-target {
+  border: 2px dashed gray;
+  background-color: rgba(53, 53, 53, 0.2);
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 20px;
+  background-color: #f4f4f4;
+}
+
+
+/* 1) Let the container shrink to fit video width */
+.video-column {
+/* remove flex: 1; or do NOT let it fill the row */
+display: inline-block; 
+vertical-align: top; 
+}
+
+/* 1) Shrink-wrap the video + controls, so no extra space on the right. */
+#video-container {
+display: inline-block;    /* shrinks to contents' width */
+vertical-align: top;
+background: #000;         /* black behind the video, if you like */
+margin: 0;                /* remove default spacing */
+padding: 0;
+}
+
+/* 2) The video is block-level, no forced width: auto => uses its intrinsic aspect ratio. */
+#video-container video {
+display: block;
+width: auto;
+height: auto;
+max-height: 60vh;         /* or any limit you want */
+margin: 0;
+padding: 0;
+}
+
+/* 3) Controls are also block-level, full width of container => exactly match the video width. */
+#player-controls {
+display: block;
+width: 100%;             /* matches the #player-wrapper width */
+margin: 0;
+padding: 5px 8px;        /* adjust to taste */
+box-sizing: border-box;
+background: #222; 
+color: #fff;
+}
+
+#player-timeline::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #333;
+  border-radius: 50%;
+  cursor: pointer;
+}
+#player-timeline::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #333;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
+#timeline {
+  width: calc(100% - 80px);
+  height: 80px;
+  background: #555;
+  position: relative;
+  margin: 0px 3%;   /* 10px top/bottom, 3% left/right */
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+#spike-triangle {
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 7px solid white;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#timeline-spike {
+  position: absolute;
+  top: 7px;
+  width: 2px;
+  height: 73px;
+  background-color: white;
+  left: 0;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* The moving "blade" indicator (vertical dashed line) */
+#split-indicator {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: repeating-linear-gradient(
+      to bottom,
+      rgb(0, 0, 0) 0,
+      rgb(0, 0, 0) 2px,
+      transparent 2px,
+      transparent 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* The green hover line */
+#hover-indicator {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: white;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Blade cursor mode */
+.blade-mode,
+.blade-mode * {
+  cursor: url('/static/scissors_cursor.png') 10 10, auto !important;
+}
+
+
+/* Container to hold Split and Export buttons in one row */
+#buttons-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 90%;
+  margin: 10px auto 20px;
+  padding: 0 5%;
+}
+
+/* Style for both the Split and Export buttons */
+#split-button,
+#export-button {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+/* For the icon size in both buttons */
+#split-button img,
+#export-button img {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
+#split-button span,
+#export-button span {
+  font-size: 18px;
+  color: #000;
+}
+
+/* Hover effect for both buttons */
+#split-button:hover,
+#export-button:hover {
+  transform: scale(1.1);
+}
+
+.hidden {
+  display: none;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  z-index: 1;
+}
+
+.modal-content {
+  position: relative;
+  margin: 15% auto;
+  padding: 20px;
+  width: 30%;
+  background-color: #fff;
+  text-align: center;
+}
+
+.close {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  cursor: pointer;
+}
+
+.button-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.centered-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Style for Export Option Buttons */
+.export-button {
+  padding: 10px 20px;
+  margin: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #fb4b0e;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+.export-button:hover {
+  background-color: #f66434;
+}
+
+
+#delete-button,
+#undo-button{
+  cursor: pointer;
+}
+#delete-button:hover,
+#undo-button:hover{
+  transform: scale(1.05);
+}
+
+/* Updated GitHub Link Styles */
+.github-link {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8); /* Optional: Background for better visibility */
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: transform 0.3s, background-color 0.3s;
+  text-decoration: none;
+  color: #000000;
+  font-family: Arial, sans-serif;
+}
+
+.github-link:hover {
+  transform: scale(1.05);
+  background-color: rgba(255, 255, 255, 1);
+}
+
+.github-link svg {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  fill: #000000;
+  transition: fill 0.3s;
+}
+
+.github-link:hover svg {
+  fill: #0366d6; /* GitHub blue on hover */
+}
+
+.github-text {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+/* Then override on small screens */
+@media (max-width: 600px) {
+  .github-link {
+    display: none;
+  }
+}
+
+
+/* 1) Two-column layout with a 20px gap */
+.layout-container {
+display: flex;
+flex-direction: row;
+gap: 20px; /* minimal gap = 20px */
+max-width: 1200px;
+margin: 0 auto;
+align-items: flex-start; /* top-align columns */
+}
+
+/* Left column: Thumbnails */
+.video-list-column {
+width: 200px; /* Or flex: 0 0 200px, if you want a fixed width. */
+overflow-y: auto; /* scroll if too tall */
+/* We'll match video height by referencing #video-container in a bit. */
+}
+
+
+.video-list-column {
+/* Suppose we set a rough max-height that approximates the video area. */
+max-height: 500px; 
+}
+
+#player-controls {
+display: flex;
+align-items: center;
+box-sizing: border-box;
+width: 100%;
+background: #222;
+color: #fff;
+padding: 5px 15px; /* Increase horizontal padding for extra space */
+margin: 0;
+gap: 5px;          /* spacing between items */
+}
+
+#play-pause-btn {
+flex: 0 0 auto;    /* button gets only as much space as needed */
+}
+#play-pause-btn:hover {
+background-color: #666;
+}
+
+#player-timeline {
+flex: 1;           /* let the slider expand/shrink in the middle */
+margin: 0 6px;     /* a small horizontal buffer on the slider itself */
+}
+
+#time-display {
+flex: 0 0 auto;    /* keep the time label at its natural size */
+}
+
+
+/* 2) Thumbnails fixed size with overlay text on top & bottom. */
+#video-list {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+}
+
+.video-item {
+position: relative;
+width: 160px;
+height: 90px;
+cursor: pointer;
+border-radius: 4px;
+overflow: hidden;
+background-color: #333;
+}
+
+.video-thumbnail {
+width: 160px;
+height: 90px;
+object-fit: cover;
+display: block;
+}
+
+.video-title, 
+.video-duration {
+position: absolute;
+left: 0;
+width: 100%;
+background: rgba(0,0,0,0.6);
+color: #fff;
+font-size: 10px;
+text-align: center;
+padding: 2px;
+box-sizing: border-box;
+white-space: nowrap;
+text-overflow: ellipsis;
+overflow: hidden;
+}
+.video-title {
+top: 0;
+}
+.video-duration {
+bottom: 0;
+}
+
+#timeline {
+width: 80%;
+height: 80px;
+background: #555;
+position: relative;
+margin: auto; /* center horizontally */
+overflow: hidden;
+border-radius: 5px;
+}
+
+
+.segment-slice {
+position: absolute;
+top: 0;
+bottom: 0;
+/* left & width are set in JS */
+background-repeat: no-repeat;
+}

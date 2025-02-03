@@ -1,13 +1,14 @@
-# ffmpeg-browser-4gb-plus
- A sample application showcasing ffmpeg usage in a browser with files over 4GB using WORKERSFS
+![](quicksplit.gif)
 
-To use it start an http server in the repository folder like this: <br>
 
+# quicksplit
+Fast client side video trimming tool in browser, works with the files up to 32 GB. The limit for output files is 4GB. E.G you can load 15GB video, but the trimmed segments should be not larger than 4 GB each
+
+To run simply type this in the project directory:<br>
 ```
-npm install -g http-server
 http-server
 ```
+Then simply open http:\<ip:port\>/video_editor.html in your browser <br>
 
-Then open ffmpegtest.html page. <br>
-
-The app trims an uploaded video (00:01-00:09 segment) and downloads the result to clients machine
+Live app: https://cliptracer.com/quicksplit <br>
+Recorded demo:
