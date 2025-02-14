@@ -10,5 +10,4 @@ http-server
 ```
 Then simply open http:\<ip:port\>/video_editor.html in your browser <br>
 
-Live app: https://cliptracer.com/quicksplit <br>
-Recorded demo:
+ <br>
